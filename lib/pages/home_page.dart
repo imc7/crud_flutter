@@ -22,7 +22,6 @@ class _HomeState extends State<Home> {
       body: FutureBuilder(
           future: find(),
           builder: ((context, snapshot) {
-            print('TESTING ### => ${snapshot.hasData}');
             if (snapshot.hasData) {
               return DataTable(
                 sortColumnIndex: 0,
@@ -37,14 +36,14 @@ class _HomeState extends State<Home> {
                     .map<DataRow>((e) => DataRow(selected: true, cells: [
                           DataCell(e.photoUrl.isEmpty
                               ? CircleAvatar(
-                                  radius: 25,
+                                  radius: 20,
                                   backgroundColor: Colors.white,
                                   backgroundImage: AssetImage(
                                     'assets/images/person.png',
                                   ),
                                 )
                               : CircleAvatar(
-                                  radius: 25,
+                                  radius: 20,
                                   backgroundImage: NetworkImage(
                                     e.photoUrl,
                                   ),
