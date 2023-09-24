@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:crud_flutter/models/PersonModel.dart';
+import 'package:crud_flutter/services/alerts.dart';
 import 'package:crud_flutter/services/firebase_service.dart';
 import 'package:crud_flutter/services/firebase_storage.dart';
 import 'package:crud_flutter/services/select_image.dart';
@@ -21,6 +23,27 @@ class _AddPersonPageState extends State<AddPersonPage> {
   String photoUrl = "";
   File? image_to_upload = null;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Listening
+    nameController.addListener(() {
+      setState(() {});
+    });
+    ageController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    ageController.dispose();
+    super.dispose();
+  }
+
+  // To select image
   void selectImage(ImageSource source) async {
     final XFile? image = await pickImage(source);
     if (image != null) {
@@ -28,6 +51,11 @@ class _AddPersonPageState extends State<AddPersonPage> {
         image_to_upload = File(image!.path);
       });
     }
+  }
+
+  // To inactivate/activate save button
+  bool shouldActiveSaveButton() {
+    return nameController.text.isNotEmpty && ageController.text.isNotEmpty;
   }
 
   @override
@@ -134,59 +162,97 @@ class _AddPersonPageState extends State<AddPersonPage> {
                     ],
                   ),
                 ),
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(hintText: 'Name'),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  controller: ageController,
-                  decoration: const InputDecoration(hintText: 'Age'),
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 0,
+                    top: 20,
+                    right: 0,
+                    bottom: 0,
+                  ),
+                  child: TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      label: Text('Name'),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
                 Container(
-                    margin: EdgeInsets.only(
-                      left: 0,
-                      top: 20,
-                      right: 0,
-                      bottom: 0,
+                  margin: EdgeInsets.only(
+                    left: 0,
+                    top: 20,
+                    right: 0,
+                    bottom: 0,
+                  ),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
+                    ],
+                    controller: ageController,
+                    decoration: const InputDecoration(
+                      label: Text('Age'),
+                      border: OutlineInputBorder(),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Cancel button
-                        MaterialButton(
-                          height: 40.0,
-                          minWidth: 100.0,
-                          color: Colors.red,
-                          textColor: Colors.white,
-                          child: new Text("Cancel"),
-                          onPressed: () => {Navigator.pop(context)},
-                          splashColor: Colors.redAccent,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 0,
+                    top: 20,
+                    right: 0,
+                    bottom: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Cancel button
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: Size(100, 40),
                         ),
-                        // Save button
-                        MaterialButton(
-                          height: 40.0,
-                          minWidth: 100.0,
-                          color: Theme.of(context).primaryColor,
-                          textColor: Colors.white,
-                          child: new Text("Save"),
-                          onPressed: () async {
-                            await save(id, nameController.text,
-                                    int.parse(ageController.text))
-                                .then((personId) async {
-                              if (image_to_upload != null) {
-                                String url = await uploadFile(
-                                    image_to_upload!, personId);
-                                await uploadPhoto(personId, url);
+                        child: Text("Cancel",
+                            style:
+                                TextStyle(fontSize: 15, color: Colors.white)),
+                        onPressed: () => {Navigator.pop(context)},
+                      ),
+                      // Save button
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          minimumSize: Size(100, 40),
+                          disabledForegroundColor: Color(0xFFC0C0C0),
+                          disabledBackgroundColor: Color(0xFFC4EAF9),
+                        ),
+                        child: Text("Save",
+                            style:
+                                TextStyle(fontSize: 15, color: Colors.white)),
+                        onPressed: shouldActiveSaveButton()
+                            ? () async {
+                                setState(() {});
+                                PersonModel person = PersonModel(
+                                  id,
+                                  nameController.text,
+                                  int.parse(ageController.text),
+                                  photoUrl,
+                                );
+                                showLoadingAlert(context);
+                                await save(person).then((personId) async {
+                                  if (image_to_upload != null) {
+                                    String url = await uploadFile(
+                                        image_to_upload!, personId);
+                                    await updatePhotoUrl(personId, url);
+                                  }
+                                  hideLoadingAlert();
+                                  Navigator.pop(context);
+                                });
                               }
-                              Navigator.pop(context);
-                            });
-                          },
-                          splashColor: Colors.redAccent,
-                        ),
-                      ],
-                    ))
+                            : null,
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

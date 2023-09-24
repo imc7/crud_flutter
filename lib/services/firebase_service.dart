@@ -6,23 +6,27 @@ import 'package:uuid/uuid.dart';
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 // Save data
-Future<String> save(String id, String name, int age) async {
+Future<String> save(PersonModel person) async {
   // Create a new user with a first and last name
+  String id = person.id;
   final user = <String, dynamic>{
-    "name": name,
-    "age": age,
+    "name": person.name,
+    "age": person.age,
     "photoUrl": "",
   };
 
-  // Para generar el id, si no es edición
+  // Generate id, if it's not create mode
   if (id == null || id.isEmpty) {
     id = Uuid().v4().toString();
-    await db.collection(Constants.collectionPerson).doc(id).set(user);
-  } else {
     await db
         .collection(Constants.collectionPerson)
         .doc(id)
-        .update(user); // Edit document
+        .set(user); // Save document
+  } else {
+    await db.collection(Constants.collectionPerson).doc(id).update({
+      "name": person.name,
+      "age": person.age,
+    }); // Edit document
   }
   return id;
 }
@@ -36,11 +40,8 @@ Future<List<PersonModel>> find() async {
   QuerySnapshot querySnapshot = await collectionReference.get();
 
   for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
-    PersonModel person = PersonModel();
-    person.id = docSnapshot.id;
-    person.name = docSnapshot.get('name');
-    person.age = docSnapshot.get('age');
-    person.photoUrl = docSnapshot.get('photoUrl') ?? '';
+    PersonModel person = PersonModel(docSnapshot.id, docSnapshot.get('name'),
+        docSnapshot.get('age'), docSnapshot.get('photoUrl') ?? '');
     response.add(person);
     print('PERSON FROM FIREBASE ${docSnapshot.id} => ${docSnapshot.data()}');
   }
@@ -54,7 +55,7 @@ Future<void> deletePerson(String id) async {
 }
 
 // Upload photo
-Future<void> uploadPhoto(String id, String photoUrl) async {
+Future<void> updatePhotoUrl(String id, String photoUrl) async {
   final washingtonRef = db.collection(Constants.collectionPerson).doc(id);
   await washingtonRef.update({"photoUrl": photoUrl}).then(
       (value) => print("DocumentSnapshot successfully updated!"),
