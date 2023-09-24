@@ -1,8 +1,9 @@
-import 'package:crud_flutter/services/alerts.dart';
-import 'package:crud_flutter/services/firebase_storage.dart';
+import 'package:crud_flutter/main.dart';
+import 'package:crud_flutter/pages/notifications_page.dart';
+import 'package:crud_flutter/pages/person_page.dart';
+import 'package:crud_flutter/pages/tray_person_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:crud_flutter/services/firebase_service.dart';
 
 class Home extends StatefulWidget {
   const Home({
@@ -19,133 +20,102 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Firebase CRUD'),
+        backgroundColor: Colors.blue.shade700,
       ),
-      body: FutureBuilder(
-          future: find(),
-          builder: ((context, snapshot) {
-            if (snapshot.hasData) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  sortColumnIndex: 0,
-                  sortAscending: true,
-                  columns: [
-                    DataColumn(label: Text('PHOTO')),
-                    DataColumn(label: Text('NAME')),
-                    DataColumn(label: Text('AGE'), numeric: true),
-                    DataColumn(label: Text('ACTIONS')),
-                  ],
-                  rows: snapshot.data!
-                      .map<DataRow>((e) => DataRow(selected: true, cells: [
-                            DataCell(e.photoUrl.isEmpty
-                                ? CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: AssetImage(
-                                      'assets/images/person.png',
-                                    ),
-                                  )
-                                : CircleAvatar(
-                                    radius: 20,
-                                    backgroundImage: NetworkImage(
-                                      e.photoUrl,
-                                    ),
-                                  )),
-                            DataCell(Text(e.name)),
-                            DataCell(Text(e.age.toString())),
-                            DataCell(Row(
-                              children: [
-                                // Edit button
-                                IconButton(
-                                  icon: new Icon(Icons.edit),
-                                  onPressed: () async {
-                                    await Navigator.pushNamed(
-                                      context,
-                                      '/add',
-                                      arguments: {
-                                        "title": "Edit person",
-                                        "person": {
-                                          "id": e.id,
-                                          "name": e.name,
-                                          "age": e.age,
-                                          "photoUrl": e.photoUrl,
-                                        }
-                                      },
-                                    );
-                                    setState(() {});
-                                  },
-                                ),
-
-                                // Delete button
-                                IconButton(
-                                  icon: new Icon(Icons.delete),
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                              title: const Center(
-                                                  child: Text('Confirm')),
-                                              content: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                      'Do you want to delete it?')
-                                                ],
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  child: Text("Yes"),
-                                                  style: TextButton.styleFrom(
-                                                    foregroundColor: Colors.red,
-                                                  ),
-                                                  onPressed: () async {
-                                                    Navigator.pop(context);
-                                                    showLoadingAlert(context);
-                                                    await deletePerson(e.id);
-                                                    // Delete photo
-                                                    if (e.photoUrl.isNotEmpty)
-                                                      await deleteFile(e.id);
-                                                    hideLoadingAlert();
-                                                    setState(() {});
-                                                  },
-                                                ),
-                                                TextButton(
-                                                    child: Text("No"),
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    }),
-                                              ],
-                                            ));
-                                  },
-                                )
-                              ],
-                            ))
-                          ]))
-                      .toList(),
-                ),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          })),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.pushNamed(
-            context,
-            '/add',
-            arguments: {
-              "title": "Create person",
-            },
-          );
-          setState(() {});
-        },
-        child: const Icon(Icons.add),
+      drawer: MyNavigationDrawer(),
+      body: Center(
+        child: Text('Welcome to home page'),
       ),
     );
   }
+}
+
+class MyNavigationDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Drawer(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              buildHeader(context),
+              builtMenuItems(context),
+            ],
+          ),
+        ),
+      );
+
+  Widget buildHeader(BuildContext context) => Material(
+        color: Colors.blue.shade700,
+        child: InkWell(
+          onTap: () {
+            // close natigation drawer before
+            Navigator.pop(context);
+
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const PersonPage()));
+          },
+          child: Container(
+            padding: EdgeInsets.only(
+                top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
+            child: Column(
+              children: const [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/images/person.png'),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  'Full name',
+                  style: TextStyle(fontSize: 28, color: Colors.white),
+                ),
+                Text(
+                  'email@example.com',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+  Widget builtMenuItems(BuildContext context) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.home_outlined),
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                    builder: (context) => const MyHomePage(title: '')),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.list_outlined),
+            title: const Text('Tray'),
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const TrayPersonPage()),
+              );
+            },
+          ),
+          const Divider(
+            color: Colors.black54,
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications_outlined),
+            title: const Text('Notifications'),
+            onTap: () {
+              // Close navigation drawer before
+              Navigator.pop(context);
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => const NotificationsPage()),
+              );
+            },
+          )
+        ],
+      );
 }

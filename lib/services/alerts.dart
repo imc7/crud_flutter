@@ -1,13 +1,48 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-late BuildContext dialogContext;
+late BuildContext loadingContext;
 
+// Confirm alert
+Future<void> confirmAlert(
+    BuildContext context, String message, VoidCallback continueCallBack) async {
+  showDialog(
+      context: context,
+      builder: (localContext) {
+        return AlertDialog(
+          title: const Center(child: Text('Confirm')),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [Text(message)],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Yes"),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              onPressed: () {
+                Navigator.pop(localContext);
+                continueCallBack();
+              },
+            ),
+            TextButton(
+                child: Text("No"),
+                onPressed: () {
+                  Navigator.pop(localContext);
+                }),
+          ],
+        );
+      });
+}
+
+// Loading alert
 showLoadingAlert(BuildContext context) {
   showDialog(
       context: context,
       builder: (BuildContext localContext) {
-        dialogContext = localContext;
+        loadingContext = localContext;
         return AlertDialog(
           content: Container(
             width: 80,
@@ -33,5 +68,5 @@ showLoadingAlert(BuildContext context) {
 }
 
 hideLoadingAlert() {
-  Navigator.pop(dialogContext);
+  Navigator.pop(loadingContext);
 }
