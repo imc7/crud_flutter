@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:crud_flutter/pages/sign_up_page.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/firebase_auth_service.dart';
-import '../widgets/text_password_field.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -18,6 +16,32 @@ class _SignInPageState extends State<SignInPage> {
 
   TextEditingController emailController = TextEditingController(text: "");
   TextEditingController passwordController = TextEditingController(text: "");
+  bool obscureText = true;
+
+  // Error validators
+  String? emailErrorMessage() {
+    String email = emailController.text;
+    if (email.isNotEmpty && !EmailValidator.validate(email))
+      return "It is not a email";
+    return null;
+  }
+
+  String? passwordErrorMessage() {
+    String password = passwordController.text;
+    if (password.isNotEmpty && password.length < 7)
+      return "Length it is not the minimum";
+    return null;
+  }
+
+  // To inactivate/activate save button
+  bool shouldActiveSaveButton() {
+    String email = emailController.text;
+    String password = passwordController.text;
+    return email.isNotEmpty &&
+        EmailValidator.validate(email) &&
+        password.isNotEmpty &&
+        password.length >= 7;
+  }
 
   @override
   void initState() {
@@ -39,12 +63,6 @@ class _SignInPageState extends State<SignInPage> {
     super.dispose();
   }
 
-  // To inactivate/activate save button
-  bool shouldActiveSaveButton() {
-    return emailController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,6 +75,7 @@ class _SignInPageState extends State<SignInPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
+                // Form
                 Container(
                   margin: EdgeInsets.only(
                     left: 0,
@@ -66,12 +85,10 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   child: TextField(
                     controller: emailController,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp('[0-9]')),
-                    ],
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       label: Text('Email'),
                       border: OutlineInputBorder(),
+                      errorText: emailErrorMessage(),
                     ),
                   ),
                 ),
@@ -82,7 +99,32 @@ class _SignInPageState extends State<SignInPage> {
                     right: 0,
                     bottom: 0,
                   ),
-                  child: TextPasswordField(controller: passwordController),
+                  child: TextField(
+                    controller: passwordController,
+                    obscureText: obscureText,
+                    decoration: InputDecoration(
+                        label: Text('Password'),
+                        border: OutlineInputBorder(),
+                        errorText: passwordErrorMessage(),
+                        prefixIcon:
+                            const Icon(Icons.lock, color: Color(0XFF4FBF26)),
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              obscureText = !obscureText;
+                            });
+                          },
+                          child: obscureText
+                              ? const Icon(
+                                  Icons.visibility_off,
+                                  color: Colors.grey,
+                                )
+                              : const Icon(
+                                  Icons.visibility,
+                                  color: Color(0XFF4FBF26),
+                                ),
+                        )),
+                  ),
                 ),
                 Container(
                   margin: EdgeInsets.only(
@@ -108,6 +150,8 @@ class _SignInPageState extends State<SignInPage> {
                         : null,
                   ),
                 ),
+
+                // Sign up button
                 Container(
                   margin: EdgeInsets.only(
                     left: 0,
@@ -116,7 +160,7 @@ class _SignInPageState extends State<SignInPage> {
                     bottom: 0,
                   ),
                   width: double.infinity,
-                  child: TextButton(
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                       minimumSize: Size(100, 40),
