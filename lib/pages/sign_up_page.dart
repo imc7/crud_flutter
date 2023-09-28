@@ -23,11 +23,10 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController ageController = TextEditingController(text: "");
   TextEditingController emailController = TextEditingController(text: "");
   TextEditingController passwordController = TextEditingController(text: "");
-  TextEditingController confirmPasswordController =
+  TextEditingController passwordControllerConfirm =
       TextEditingController(text: "");
   String photoUrl = "";
   File? image_to_upload = null;
-  bool _emailOk = false;
   bool obscureText = true;
   bool obscureTextConfirm = true;
 
@@ -48,7 +47,7 @@ class _SignUpPageState extends State<SignUpPage> {
     passwordController.addListener(() {
       setState(() {});
     });
-    confirmPasswordController.addListener(() {
+    passwordControllerConfirm.addListener(() {
       setState(() {});
     });
   }
@@ -59,7 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
     ageController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    confirmPasswordController.dispose();
+    passwordControllerConfirm.dispose();
     super.dispose();
   }
 
@@ -77,10 +76,9 @@ class _SignUpPageState extends State<SignUpPage> {
   bool shouldActiveSaveButton() {
     return nameController.text.isNotEmpty &&
         ageController.text.isNotEmpty &&
-        emailController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty &&
-        confirmPasswordController.text.isNotEmpty &&
-        _emailOk;
+        emailErrorMessage == null &&
+        passwordErrorMessage == null &&
+        passwordConfirmErrorMessage == null;
   }
 
   // Error validators
@@ -99,9 +97,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   String? passwordConfirmErrorMessage() {
-    String confirmPassword = confirmPasswordController.text;
+    String confirmPassword = passwordControllerConfirm.text;
     if (confirmPassword.isNotEmpty &&
-        passwordController.text != passwordController.text)
+        confirmPassword != passwordController.text)
       return "Password confirm is not the same with passwod";
     return null;
   }
@@ -305,7 +303,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     bottom: 0,
                   ),
                   child: TextField(
-                    controller: confirmPasswordController,
+                    controller: passwordControllerConfirm,
                     obscureText: obscureTextConfirm,
                     decoration: InputDecoration(
                         label: Text('Confirm password'),
@@ -316,10 +314,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         suffixIcon: GestureDetector(
                           onTap: () {
                             setState(() {
-                              obscureText = !obscureText;
+                              obscureTextConfirm = !obscureTextConfirm;
                             });
                           },
-                          child: obscureText
+                          child: obscureTextConfirm
                               ? const Icon(
                                   Icons.visibility_off,
                                   color: Colors.grey,
