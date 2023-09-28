@@ -28,6 +28,8 @@ class _SignUpPageState extends State<SignUpPage> {
   String photoUrl = "";
   File? image_to_upload = null;
   bool _emailOk = false;
+  bool obscureText = true;
+  bool obscureTextConfirm = true;
 
   @override
   void initState() {
@@ -79,6 +81,29 @@ class _SignUpPageState extends State<SignUpPage> {
         passwordController.text.isNotEmpty &&
         confirmPasswordController.text.isNotEmpty &&
         _emailOk;
+  }
+
+  // Error validators
+  String? emailErrorMessage() {
+    String email = emailController.text;
+    if (email.isNotEmpty && !EmailValidator.validate(email))
+      return "It is not a email";
+    return null;
+  }
+
+  String? passwordErrorMessage() {
+    String password = passwordController.text;
+    if (password.isNotEmpty && password.length < 7)
+      return "Length it is not the minimum";
+    return null;
+  }
+
+  String? passwordConfirmErrorMessage() {
+    String confirmPassword = confirmPasswordController.text;
+    if (confirmPassword.isNotEmpty &&
+        passwordController.text != passwordController.text)
+      return "Password confirm is not the same with passwod";
+    return null;
   }
 
   @override
@@ -177,6 +202,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ],
                   ),
                 ),
+
                 // Name
                 Container(
                   margin: EdgeInsets.only(
@@ -193,6 +219,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
+
                 // Age
                 Container(
                   margin: EdgeInsets.only(
@@ -213,6 +240,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
+
                 // Email
                 Container(
                   margin: EdgeInsets.only(
@@ -224,17 +252,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: TextField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
-                    onChanged: (value) {
-                      setState(() {
-                        _emailOk = EmailValidator.validate(value);
-                      });
-                    },
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       label: Text('Email'),
                       border: OutlineInputBorder(),
+                      errorText: emailErrorMessage(),
                     ),
                   ),
                 ),
+
                 // Password
                 Container(
                   margin: EdgeInsets.only(
@@ -243,19 +268,70 @@ class _SignUpPageState extends State<SignUpPage> {
                     right: 0,
                     bottom: 0,
                   ),
-                  child: TextPasswordField(controller: passwordController),
+                  child: TextField(
+                    controller: passwordController,
+                    obscureText: obscureText,
+                    decoration: InputDecoration(
+                        label: Text('Password'),
+                        border: OutlineInputBorder(),
+                        errorText: passwordErrorMessage(),
+                        prefixIcon:
+                            const Icon(Icons.lock, color: Color(0XFF4FBF26)),
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              obscureText = !obscureText;
+                            });
+                          },
+                          child: obscureText
+                              ? const Icon(
+                                  Icons.visibility_off,
+                                  color: Colors.grey,
+                                )
+                              : const Icon(
+                                  Icons.visibility,
+                                  color: Color(0XFF4FBF26),
+                                ),
+                        )),
+                  ),
                 ),
+
                 // Confirm password
                 Container(
                   margin: EdgeInsets.only(
                     left: 0,
-                    top: 20,
+                    top: 30,
                     right: 0,
                     bottom: 0,
                   ),
-                  child:
-                      TextPasswordField(controller: confirmPasswordController),
+                  child: TextField(
+                    controller: confirmPasswordController,
+                    obscureText: obscureTextConfirm,
+                    decoration: InputDecoration(
+                        label: Text('Confirm password'),
+                        border: OutlineInputBorder(),
+                        errorText: passwordConfirmErrorMessage(),
+                        prefixIcon:
+                            const Icon(Icons.lock, color: Color(0XFF4FBF26)),
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              obscureText = !obscureText;
+                            });
+                          },
+                          child: obscureText
+                              ? const Icon(
+                                  Icons.visibility_off,
+                                  color: Colors.grey,
+                                )
+                              : const Icon(
+                                  Icons.visibility,
+                                  color: Color(0XFF4FBF26),
+                                ),
+                        )),
+                  ),
                 ),
+
                 // Control buttons
                 Container(
                   margin: EdgeInsets.only(

@@ -16,6 +16,7 @@ class _SignInPageState extends State<SignInPage> {
 
   TextEditingController emailController = TextEditingController(text: "");
   TextEditingController passwordController = TextEditingController(text: "");
+  bool remenberSwitch = true;
   bool obscureText = true;
 
   // Error validators
@@ -75,7 +76,9 @@ class _SignInPageState extends State<SignInPage> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // Form
+                // Form //////////////////////////////////////////////
+
+                // Email
                 Container(
                   margin: EdgeInsets.only(
                     left: 0,
@@ -85,6 +88,7 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   child: TextField(
                     controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       label: Text('Email'),
                       border: OutlineInputBorder(),
@@ -92,6 +96,8 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
+
+                // Password
                 Container(
                   margin: EdgeInsets.only(
                     left: 0,
@@ -126,6 +132,29 @@ class _SignInPageState extends State<SignInPage> {
                         )),
                   ),
                 ),
+
+                // Remenber toggle
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 0,
+                    top: 20,
+                    right: 0,
+                    bottom: 0,
+                  ),
+                  width: double.infinity,
+                  child: SwitchListTile(
+                    title: const Text("Remember me?"),
+                    value: remenberSwitch,
+                    onChanged: (bool value) {
+                      setState(() {
+                        remenberSwitch = value;
+                      });
+                    },
+                    activeColor: Colors.green.shade400,
+                  ),
+                ),
+
+                // Send button
                 Container(
                   margin: EdgeInsets.only(
                     left: 0,
