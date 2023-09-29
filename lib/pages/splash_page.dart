@@ -1,5 +1,6 @@
 import 'package:crud_flutter/pages/sign_in_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
@@ -16,6 +17,7 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     navigate_to_home();
   }
 

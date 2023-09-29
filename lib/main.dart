@@ -1,4 +1,4 @@
-import 'package:crud_flutter/pages/splash.dart';
+import 'package:crud_flutter/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 
 // Para Firebase
