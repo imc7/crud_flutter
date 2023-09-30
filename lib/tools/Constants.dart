@@ -12,4 +12,5 @@ class Constants {
   static const String authCodeEmailAlreadyInUse = 'email-already-in-use';
   static const String userNotFound = 'user-not-found';
   static const String wrongPassword = 'wrong-password';
+  static const String invalidLoginCredential = 'INVALID_LOGIN_CREDENTIALS';
 }
