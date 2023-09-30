@@ -1,4 +1,5 @@
 import 'package:crud_flutter/pages/sign_up_page.dart';
+import 'package:crud_flutter/tools/preferences_tools.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,10 +34,6 @@ class _SignInPageState extends State<SignInPage> {
   void initState() {
     super.initState();
 
-    // Passing parameters
-    emailController.text = widget.email ?? "";
-    passwordController.text = widget.password ?? "";
-
     // Listening
     emailController.addListener(() {
       setState(() {});
@@ -44,6 +41,10 @@ class _SignInPageState extends State<SignInPage> {
     passwordController.addListener(() {
       setState(() {});
     });
+
+    // Passing parameters
+    emailController.text = widget.email ?? "";
+    passwordController.text = widget.password ?? "";
   }
 
   @override
@@ -197,6 +198,11 @@ class _SignInPageState extends State<SignInPage> {
                                           .requestFocus(FocusNode());
                                     });
                                   } else if (code == Constants.code_success) {
+                                    removePreferences(); // First remove data in Preferences
+                                    if (remenberSwitch) {
+                                      saveIntoPreferences(email,
+                                          password); // Second save data into Preferences
+                                    }
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(

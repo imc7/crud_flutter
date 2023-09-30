@@ -1,9 +1,16 @@
 import 'package:crud_flutter/main.dart';
 import 'package:crud_flutter/pages/notifications_page.dart';
 import 'package:crud_flutter/pages/person_page.dart';
+import 'package:crud_flutter/pages/sign_in_page.dart';
 import 'package:crud_flutter/pages/tray_person_page.dart';
+import 'package:crud_flutter/services/alerts.dart';
+import 'package:crud_flutter/tools/preferences_tools.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../dtos/response_dto.dart';
+import '../services/firebase_auth_service.dart';
+import '../tools/Constants.dart';
 
 class Home extends StatefulWidget {
   const Home({
@@ -31,6 +38,9 @@ class _HomeState extends State<Home> {
 }
 
 class MyNavigationDrawer extends StatelessWidget {
+  // Main
+  FirebaseAuthService authService = FirebaseAuthService();
+
   @override
   Widget build(BuildContext context) => Drawer(
         child: SingleChildScrollView(
@@ -114,6 +124,37 @@ class MyNavigationDrawer extends StatelessWidget {
                 MaterialPageRoute(
                     builder: (context) => const NotificationsPage()),
               );
+            },
+          ),
+
+          // sign out
+          const Divider(
+            color: Colors.black54,
+          ),
+          ListTile(
+            leading: const Icon(Icons.login),
+            title: const Text('Sign out'),
+            onTap: () async {
+              // Close navigation drawer before
+              await confirmAlert(context, "Are you sure sign out?", () async {
+                Navigator.of(context).pop();
+                showLoadingAlert(context, 'Getting sign out...');
+                await removePreferences();
+                ResponseDTO<String> response = await authService.signOut();
+                hideLoadingAlert();
+
+                int code = response.code;
+                String message = response.message;
+                if (code == Constants.code_warning ||
+                    code == Constants.code_error) {
+                  successOrWarningOrErrorAlert(context, code, message, () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  });
+                } else if (code == Constants.code_success) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => SignInPage()));
+                }
+              });
             },
           )
         ],

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:crud_flutter/models/PersonModel.dart';
 import 'package:crud_flutter/services/alerts.dart';
 import 'package:crud_flutter/services/firebase_firestore_service.dart';
-import 'package:crud_flutter/services/firebase_storage.dart';
+import 'package:crud_flutter/services/firebase_storage_service.dart';
 import 'package:crud_flutter/services/select_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

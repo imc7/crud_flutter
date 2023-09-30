@@ -47,4 +47,18 @@ class FirebaseAuthService {
       return ResponseDTO(Constants.code_error, 'It was wrong!', "");
     }
   }
+
+  // Sign out
+  Future<ResponseDTO<String>> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      return ResponseDTO(Constants.code_success, 'Sign out successfully', "");
+    } on FirebaseAuthException catch (e) {
+      print("FirebaseAuthException: ${e}");
+      return ResponseDTO(Constants.code_warning, 'Could not sign out', e.code);
+    } catch (e) {
+      print("FirebaseAuthException catch: ${e}");
+      return ResponseDTO(Constants.code_error, 'It was wrong!', "");
+    }
+  }
 }
