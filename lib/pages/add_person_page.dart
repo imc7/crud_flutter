@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:crud_flutter/models/PersonModel.dart';
 import 'package:crud_flutter/services/alerts.dart';
-import 'package:crud_flutter/services/firebase_service.dart';
+import 'package:crud_flutter/services/firebase_firestore_service.dart';
 import 'package:crud_flutter/services/firebase_storage.dart';
 import 'package:crud_flutter/services/select_image.dart';
 import 'package:flutter/material.dart';
@@ -237,7 +237,7 @@ class _AddPersonPageState extends State<AddPersonPage> {
                                   int.parse(ageController.text),
                                   photoUrl,
                                 );
-                                showLoadingAlert(context);
+                                showLoadingAlert(context, null);
                                 await save(person).then((personId) async {
                                   if (image_to_upload != null) {
                                     String url = await uploadFile(

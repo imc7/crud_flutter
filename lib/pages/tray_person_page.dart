@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:crud_flutter/services/alerts.dart';
-import 'package:crud_flutter/services/firebase_service.dart';
+import 'package:crud_flutter/services/firebase_firestore_service.dart';
 import 'package:crud_flutter/services/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -115,7 +115,7 @@ class _TrayPersonPageState extends State<TrayPersonPage> {
                                               await confirmAlert(context,
                                                   "Do you want to delete it?",
                                                   () async {
-                                                showLoadingAlert(context);
+                                                showLoadingAlert(context, null);
                                                 await deletePerson(e.id);
                                                 // Delete photo
                                                 if (e.photoUrl.isNotEmpty)
