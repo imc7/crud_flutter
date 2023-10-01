@@ -66,9 +66,8 @@ Future<void> successOrWarningOrErrorAlert(BuildContext context, int code,
 }
 
 // Confirm alert
-Future<void> confirmAlert(
-    BuildContext context, String message, VoidCallback continueCallBack) async {
-  showDialog(
+Future<bool> confirmAlert(BuildContext context, String message) async {
+  bool answer = await showDialog(
       context: context,
       builder: (localContext) {
         return AlertDialog(
@@ -85,18 +84,18 @@ Future<void> confirmAlert(
                 foregroundColor: Colors.red,
               ),
               onPressed: () {
-                Navigator.pop(localContext);
-                continueCallBack();
+                Navigator.pop(localContext, true);
               },
             ),
             TextButton(
                 child: Text("No"),
                 onPressed: () {
-                  Navigator.pop(localContext);
+                  Navigator.pop(localContext, false);
                 }),
           ],
         );
       });
+  return answer;
 }
 
 // Loading alert

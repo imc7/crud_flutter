@@ -31,6 +31,12 @@ class FirebaseAuthService {
     try {
       final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+
+      final user = credential.user;
+      print("user?.uid ${user?.uid}");
+      print("user?.email ${user?.email}");
+      print("user?.email ${user}");
+
       return ResponseDTO(Constants.code_success, 'It was good!', "");
     } on FirebaseAuthException catch (e) {
       String message = 'Could not do autentication';

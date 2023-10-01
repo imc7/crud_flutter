@@ -112,9 +112,10 @@ class _TrayPersonPageState extends State<TrayPersonPage> {
                                           IconButton(
                                             icon: new Icon(Icons.delete),
                                             onPressed: () async {
-                                              await confirmAlert(context,
-                                                  "Do you want to delete it?",
-                                                  () async {
+                                              bool answer = await confirmAlert(
+                                                  context,
+                                                  "Do you want to delete it?");
+                                              if (answer) {
                                                 showLoadingAlert(context, null);
                                                 await deletePerson(e.id);
                                                 // Delete photo
@@ -122,7 +123,7 @@ class _TrayPersonPageState extends State<TrayPersonPage> {
                                                   await deleteFile(e.id);
                                                 hideLoadingAlert();
                                                 setState(() {});
-                                              });
+                                              }
                                             },
                                           )
                                         ],

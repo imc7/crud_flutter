@@ -136,8 +136,10 @@ class MyNavigationDrawer extends StatelessWidget {
             title: const Text('Sign out'),
             onTap: () async {
               // Close navigation drawer before
-              await confirmAlert(context, "Are you sure sign out?", () async {
-                Navigator.of(context).pop();
+              bool answer =
+                  await confirmAlert(context, "Are you sure sign out?");
+              Navigator.of(context).pop();
+              if (answer) {
                 showLoadingAlert(context, 'Getting sign out...');
                 await removePreferences();
                 ResponseDTO<String> response = await authService.signOut();
@@ -154,7 +156,7 @@ class MyNavigationDrawer extends StatelessWidget {
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => SignInPage()));
                 }
-              });
+              }
             },
           )
         ],
