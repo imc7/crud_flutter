@@ -18,6 +18,13 @@ class FirebaseAuthService {
         password: toSave.password!,
       );
       User? user = credential.user;
+      await user?.updateDisplayName(toSave.displayName);
+      if (user != null && toSave.photoFile != null) {
+        ResponseDTO<String> response = await firebaseStorageService.uploadFile(
+            toSave.photoFile!, user.uid);
+        if (response.code == Constants.code_success)
+          await user?.updatePhotoURL(response.data);
+      }
       return ResponseDTO(Constants.code_success, 'It was good!', "");
     } on FirebaseAuthException catch (e) {
       String message = 'Could not sign up user';
@@ -35,7 +42,6 @@ class FirebaseAuthService {
   // Get current user
   User? getCurrentUser() {
     User? current = FirebaseAuth.instance.currentUser;
-    print("current user: ${current}");
     if (current != null) return current;
     return null;
   }

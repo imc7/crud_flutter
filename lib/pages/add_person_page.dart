@@ -5,9 +5,12 @@ import 'package:crud_flutter/services/alerts_service.dart';
 import 'package:crud_flutter/services/firebase_firestore_service.dart';
 import 'package:crud_flutter/services/firebase_storage_service.dart';
 import 'package:crud_flutter/services/select_image.dart';
+import 'package:crud_flutter/tools/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../dtos/response_dto.dart';
 
 class AddPersonPage extends StatefulWidget {
   const AddPersonPage({super.key});
@@ -60,6 +63,8 @@ class _AddPersonPageState extends State<AddPersonPage> {
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseStorageService firebaseStorageService =
+        FirebaseStorageService();
     // Get arguments from route
     final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
     String title = arguments['title'] ?? '--';
@@ -240,9 +245,19 @@ class _AddPersonPageState extends State<AddPersonPage> {
                                 showLoadingAlert(context, null);
                                 await save(person).then((personId) async {
                                   if (image_to_upload != null) {
-                                    String url = await uploadFile(
-                                        image_to_upload!, personId);
-                                    await updatePhotoUrl(personId, url);
+                                    ResponseDTO<String> response =
+                                        await firebaseStorageService.uploadFile(
+                                            image_to_upload!, personId);
+
+                                    int code = response.code;
+                                    if (code == Constants.code_warning ||
+                                        code == Constants.code_error) {
+                                      successOrWarningOrErrorAlert(context,
+                                          code, response.message, null);
+                                    } else if (code == Constants.code_success) {
+                                      await updatePhotoUrl(
+                                          personId, response.data);
+                                    }
                                   }
                                   hideLoadingAlert();
                                   Navigator.pop(context);

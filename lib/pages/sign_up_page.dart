@@ -333,10 +333,14 @@ class _SignUpPageState extends State<SignUpPage> {
                                       context, 'Getting sign up user...');
 
                                   UserDTO toSave = UserDTO(
-                                      null, email, nameController.text, null);
+                                      null,
+                                      nameController.text,
+                                      null,
+                                      email,
+                                      password,
+                                      image_to_upload);
                                   ResponseDTO<String> response =
-                                      await authService.signUp(
-                                          toSave, password, null);
+                                      await authService.signUp(toSave);
                                   hideLoadingAlert();
 
                                   int code = response.code;

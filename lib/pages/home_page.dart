@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
 
 class MyNavigationDrawer extends StatelessWidget {
   // Main
-  FirebaseAuthService authService = FirebaseAuthService();
+  final FirebaseAuthService authService = FirebaseAuthService();
 
   @override
   Widget build(BuildContext context) => Drawer(
@@ -70,10 +70,17 @@ class MyNavigationDrawer extends StatelessWidget {
                 top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/images/person.png'),
-                ),
+                authService.getCurrentUser() != null &&
+                        authService.getCurrentUser()!.photoURL != null
+                    ? CircleAvatar(
+                        radius: 50,
+                        backgroundImage: NetworkImage(
+                            authService.getCurrentUser()!.photoURL!),
+                      )
+                    : CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage('assets/images/person.png'),
+                      ),
                 SizedBox(
                   height: 12,
                 ),

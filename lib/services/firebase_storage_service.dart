@@ -11,10 +11,8 @@ class FirebaseStorageService {
   Future<ResponseDTO<String>> uploadFile(File file, String id) async {
     // Create a storage reference from our app
     final storageRef = FirebaseStorage.instance.ref();
-
     // Create a reference to 'images/fileName.jpg'
     final mountainImagesRef = storageRef.child("images/${id}.jpg");
-
     try {
       await mountainImagesRef.putFile(file);
       String photoURL = await mountainImagesRef.getDownloadURL();
@@ -22,6 +20,9 @@ class FirebaseStorageService {
     } on FirebaseException catch (e) {
       return ResponseDTO(
           Constants.code_warning, "Could not upload file", e.code);
+    } catch (e) {
+      return ResponseDTO(
+          Constants.code_error, "It was wrong to upload file", '');
     }
   }
 
@@ -29,8 +30,7 @@ class FirebaseStorageService {
   Future<void> deleteFile(String id) async {
     // Create a reference to the file to delete
     final desertRef = FirebaseStorage.instance.ref().child("images/${id}.jpg");
-
-// Delete the file
+    // Delete the file
     await desertRef.delete();
   }
 }

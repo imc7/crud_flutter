@@ -16,6 +16,8 @@ class TrayPersonPage extends StatefulWidget {
 }
 
 class _TrayPersonPageState extends State<TrayPersonPage> {
+  FirebaseStorageService firebaseStorageService = FirebaseStorageService();
+
   @override
   void initState() {
     super.initState();
@@ -120,7 +122,8 @@ class _TrayPersonPageState extends State<TrayPersonPage> {
                                                 await deletePerson(e.id);
                                                 // Delete photo
                                                 if (e.photoUrl.isNotEmpty)
-                                                  await deleteFile(e.id);
+                                                  await firebaseStorageService
+                                                      .deleteFile(e.id);
                                                 hideLoadingAlert();
                                                 setState(() {});
                                               }
