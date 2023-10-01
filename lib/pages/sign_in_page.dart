@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../dtos/response_dto.dart';
 import '../main.dart';
-import '../services/alerts.dart';
+import '../services/alerts_service.dart';
 import '../services/firebase_auth_service.dart';
 import '../tools/Constants.dart';
 
@@ -114,8 +114,8 @@ class _SignInPageState extends State<SignInPage> {
                           decoration: InputDecoration(
                               label: Text('Password'),
                               border: OutlineInputBorder(),
-                              prefixIcon: const Icon(Icons.lock,
-                                  color: Color(0XFF4FBF26)),
+                              prefixIcon:
+                                  const Icon(Icons.lock, color: Colors.black54),
                               suffixIcon: GestureDetector(
                                 onTap: () {
                                   setState(() {
@@ -129,7 +129,7 @@ class _SignInPageState extends State<SignInPage> {
                                       )
                                     : const Icon(
                                         Icons.visibility,
-                                        color: Color(0XFF4FBF26),
+                                        color: Colors.black87,
                                       ),
                               )),
                         ),

@@ -1,9 +1,10 @@
 import 'package:crud_flutter/main.dart';
+import 'package:crud_flutter/dtos/UserDTO.dart';
 import 'package:crud_flutter/pages/notifications_page.dart';
 import 'package:crud_flutter/pages/person_page.dart';
 import 'package:crud_flutter/pages/sign_in_page.dart';
 import 'package:crud_flutter/pages/tray_person_page.dart';
-import 'package:crud_flutter/services/alerts.dart';
+import 'package:crud_flutter/services/alerts_service.dart';
 import 'package:crud_flutter/tools/preferences_tools.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class MyNavigationDrawer extends StatelessWidget {
             padding: EdgeInsets.only(
                 top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
             child: Column(
-              children: const [
+              children: [
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: AssetImage('assets/images/person.png'),
@@ -77,11 +78,11 @@ class MyNavigationDrawer extends StatelessWidget {
                   height: 12,
                 ),
                 Text(
-                  'Full name',
+                  authService.getCurrentUser()?.displayName ?? 'Fullname',
                   style: TextStyle(fontSize: 28, color: Colors.white),
                 ),
                 Text(
-                  'email@example.com',
+                  authService.getCurrentUser()?.email ?? 'email@example.com',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 )
               ],
@@ -138,12 +139,9 @@ class MyNavigationDrawer extends StatelessWidget {
               // Close navigation drawer before
               bool answer =
                   await confirmAlert(context, "Are you sure sign out?");
-              Navigator.of(context).pop();
               if (answer) {
-                showLoadingAlert(context, 'Getting sign out...');
                 await removePreferences();
                 ResponseDTO<String> response = await authService.signOut();
-                hideLoadingAlert();
 
                 int code = response.code;
                 String message = response.message;

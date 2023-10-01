@@ -1,6 +1,7 @@
 import 'package:crud_flutter/tools/Constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 late BuildContext loadingContext;
 
@@ -132,4 +133,42 @@ showLoadingAlert(BuildContext context, String? message) {
 
 hideLoadingAlert() {
   Navigator.pop(loadingContext);
+}
+
+// Selecta an image
+Future<ImageSource?> pickImageAlert(BuildContext context) async {
+  ImageSource? answer = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Center(child: Text('Select an option')),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                    iconSize: 36.0,
+                    onPressed: () {
+                      Navigator.pop(context, ImageSource.camera);
+                    },
+                    icon: Icon(Icons.add_a_photo)),
+                IconButton(
+                    iconSize: 36.0,
+                    onPressed: () {
+                      Navigator.pop(context, ImageSource.gallery);
+                    },
+                    icon: Icon(Icons.folder))
+              ],
+            ),
+            actions: [
+              TextButton(
+                  child: Text("Cancel"),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context, null);
+                  }),
+            ],
+          ));
+  return answer;
 }

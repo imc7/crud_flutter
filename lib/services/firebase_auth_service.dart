@@ -1,17 +1,23 @@
+import 'dart:io';
+
 import 'package:crud_flutter/dtos/response_dto.dart';
+import 'package:crud_flutter/dtos/UserDTO.dart';
+import 'package:crud_flutter/services/firebase_storage_service.dart';
 import 'package:crud_flutter/tools/Constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseAuthService {
+  FirebaseStorageService firebaseStorageService = FirebaseStorageService();
+
   // Register new user
-  Future<ResponseDTO<String>> signUp(
-      String emailAddress, String password) async {
+  Future<ResponseDTO<String>> signUp(UserDTO toSave) async {
     try {
       final credential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailAddress,
-        password: password,
+        email: toSave.email!,
+        password: toSave.password!,
       );
+      User? user = credential.user;
       return ResponseDTO(Constants.code_success, 'It was good!', "");
     } on FirebaseAuthException catch (e) {
       String message = 'Could not sign up user';
@@ -26,17 +32,19 @@ class FirebaseAuthService {
     }
   }
 
+  // Get current user
+  User? getCurrentUser() {
+    User? current = FirebaseAuth.instance.currentUser;
+    print("current user: ${current}");
+    if (current != null) return current;
+    return null;
+  }
+
   // Login user
   Future<ResponseDTO<String>> signIn(String email, String password) async {
     try {
       final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-
-      final user = credential.user;
-      print("user?.uid ${user?.uid}");
-      print("user?.email ${user?.email}");
-      print("user?.email ${user}");
-
       return ResponseDTO(Constants.code_success, 'It was good!', "");
     } on FirebaseAuthException catch (e) {
       String message = 'Could not do autentication';

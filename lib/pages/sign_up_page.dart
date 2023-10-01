@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:crud_flutter/dtos/response_dto.dart';
+import 'package:crud_flutter/dtos/UserDTO.dart';
 import 'package:crud_flutter/pages/sign_in_page.dart';
-import 'package:crud_flutter/services/alerts.dart';
+import 'package:crud_flutter/services/alerts_service.dart';
 import 'package:crud_flutter/services/select_image.dart';
 import 'package:crud_flutter/tools/Constants.dart';
 import 'package:email_validator/email_validator.dart';
@@ -86,9 +87,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   Container(
                     margin: EdgeInsets.only(
                       left: 0,
-                      top: 20,
+                      top: 10,
                       right: 0,
-                      bottom: 20,
+                      bottom: 10,
                     ),
                     child: Stack(
                       children: [
@@ -117,51 +118,15 @@ class _SignUpPageState extends State<SignUpPage> {
                                   ),
                         Positioned(
                           child: IconButton(
-                            icon: Icon(Icons.add_a_photo),
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                        title: const Center(
-                                            child: Text('Select an option')),
-                                        content: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            IconButton(
-                                                iconSize: 36.0,
-                                                onPressed: () {
-                                                  selectImage(
-                                                      ImageSource.camera);
-                                                  Navigator.pop(context);
-                                                },
-                                                icon: Icon(Icons.add_a_photo)),
-                                            IconButton(
-                                                iconSize: 36.0,
-                                                onPressed: () {
-                                                  selectImage(
-                                                      ImageSource.gallery);
-                                                  Navigator.pop(context);
-                                                },
-                                                icon: Icon(Icons.folder))
-                                          ],
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                              child: Text("Cancel"),
-                                              style: TextButton.styleFrom(
-                                                foregroundColor: Colors.red,
-                                              ),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              }),
-                                        ],
-                                      ));
+                            icon:
+                                Icon(Icons.add_a_photo, color: Colors.black54),
+                            onPressed: () async {
+                              ImageSource? answer =
+                                  await pickImageAlert(context);
+                              if (answer != null) selectImage(answer);
                             },
                           ),
-                          bottom: -15,
+                          bottom: -10,
                           left: 80,
                         )
                       ],
@@ -258,7 +223,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           label: Text('Password'),
                           border: OutlineInputBorder(),
                           prefixIcon:
-                              const Icon(Icons.lock, color: Color(0XFF4FBF26)),
+                              const Icon(Icons.lock, color: Colors.black54),
                           suffixIcon: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -272,7 +237,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   )
                                 : const Icon(
                                     Icons.visibility,
-                                    color: Color(0XFF4FBF26),
+                                    color: Colors.black54,
                                   ),
                           )),
                     ),
@@ -299,7 +264,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           label: Text('Confirm password'),
                           border: OutlineInputBorder(),
                           prefixIcon:
-                              const Icon(Icons.lock, color: Color(0XFF4FBF26)),
+                              const Icon(Icons.lock, color: Colors.black54),
                           suffixIcon: GestureDetector(
                             onTap: () {
                               setState(() {
@@ -313,7 +278,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   )
                                 : const Icon(
                                     Icons.visibility,
-                                    color: Color(0XFF4FBF26),
+                                    color: Colors.black54,
                                   ),
                           )),
                     ),
@@ -366,8 +331,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                   String password = passwordController.text;
                                   showLoadingAlert(
                                       context, 'Getting sign up user...');
+
+                                  UserDTO toSave = UserDTO(
+                                      null, email, nameController.text, null);
                                   ResponseDTO<String> response =
-                                      await authService.signUp(email, password);
+                                      await authService.signUp(
+                                          toSave, password, null);
                                   hideLoadingAlert();
 
                                   int code = response.code;
