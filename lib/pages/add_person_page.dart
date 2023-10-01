@@ -20,6 +20,7 @@ class AddPersonPage extends StatefulWidget {
 }
 
 class _AddPersonPageState extends State<AddPersonPage> {
+  AlertService alertService = AlertService();
   String id = "";
   TextEditingController nameController = TextEditingController(text: "");
   TextEditingController ageController = TextEditingController(text: "");
@@ -119,46 +120,12 @@ class _AddPersonPageState extends State<AddPersonPage> {
                       Positioned(
                         child: IconButton(
                           icon: Icon(Icons.add_a_photo),
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                      title: const Center(
-                                          child: Text('Select an option')),
-                                      content: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          IconButton(
-                                              iconSize: 36.0,
-                                              onPressed: () {
-                                                selectImage(ImageSource.camera);
-                                                Navigator.pop(context);
-                                              },
-                                              icon: Icon(Icons.add_a_photo)),
-                                          IconButton(
-                                              iconSize: 36.0,
-                                              onPressed: () {
-                                                selectImage(
-                                                    ImageSource.gallery);
-                                                Navigator.pop(context);
-                                              },
-                                              icon: Icon(Icons.folder))
-                                        ],
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                            child: Text("Cancel"),
-                                            style: TextButton.styleFrom(
-                                              foregroundColor: Colors.red,
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            }),
-                                      ],
-                                    ));
+                          onPressed: () async {
+                            ImageSource? answer =
+                                await alertService.pickImageAlert(context);
+                            if (answer != null) {
+                              selectImage(answer);
+                            }
                           },
                         ),
                         bottom: -10,
@@ -242,7 +209,7 @@ class _AddPersonPageState extends State<AddPersonPage> {
                                   int.parse(ageController.text),
                                   photoUrl,
                                 );
-                                showLoadingAlert(context, null);
+                                alertService.showLoadingAlert(context, null);
                                 await save(person).then((personId) async {
                                   if (image_to_upload != null) {
                                     ResponseDTO<String> response =
@@ -252,14 +219,17 @@ class _AddPersonPageState extends State<AddPersonPage> {
                                     int code = response.code;
                                     if (code == Constants.code_warning ||
                                         code == Constants.code_error) {
-                                      successOrWarningOrErrorAlert(context,
-                                          code, response.message, null);
+                                      alertService.successOrWarningOrErrorAlert(
+                                          context,
+                                          code,
+                                          response.message,
+                                          null);
                                     } else if (code == Constants.code_success) {
                                       await updatePhotoUrl(
                                           personId, response.data);
                                     }
                                   }
-                                  hideLoadingAlert();
+                                  alertService.hideLoadingAlert();
                                   Navigator.pop(context);
                                 });
                               }

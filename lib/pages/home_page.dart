@@ -41,6 +41,7 @@ class _HomeState extends State<Home> {
 class MyNavigationDrawer extends StatelessWidget {
   // Main
   final FirebaseAuthService authService = FirebaseAuthService();
+  AlertService alertService = AlertService();
 
   @override
   Widget build(BuildContext context) => Drawer(
@@ -144,8 +145,8 @@ class MyNavigationDrawer extends StatelessWidget {
             title: const Text('Sign out'),
             onTap: () async {
               // Close navigation drawer before
-              bool answer =
-                  await confirmAlert(context, "Are you sure sign out?");
+              bool answer = await alertService.confirmAlert(
+                  context, "Are you sure sign out?");
               if (answer) {
                 await removePreferences();
                 ResponseDTO<String> response = await authService.signOut();
@@ -154,7 +155,8 @@ class MyNavigationDrawer extends StatelessWidget {
                 String message = response.message;
                 if (code == Constants.code_warning ||
                     code == Constants.code_error) {
-                  successOrWarningOrErrorAlert(context, code, message, () {
+                  alertService
+                      .successOrWarningOrErrorAlert(context, code, message, () {
                     FocusScope.of(context).requestFocus(FocusNode());
                   });
                 } else if (code == Constants.code_success) {

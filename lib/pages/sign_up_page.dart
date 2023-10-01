@@ -23,6 +23,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   // Main
   FirebaseAuthService authService = FirebaseAuthService();
+  AlertService alertService = AlertService();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   // Controllers
   TextEditingController nameController = TextEditingController(text: "");
@@ -122,7 +123,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 Icon(Icons.add_a_photo, color: Colors.black54),
                             onPressed: () async {
                               ImageSource? answer =
-                                  await pickImageAlert(context);
+                                  await alertService.pickImageAlert(context);
                               if (answer != null) selectImage(answer);
                             },
                           ),
@@ -329,7 +330,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               ? () async {
                                   String email = emailController.text;
                                   String password = passwordController.text;
-                                  showLoadingAlert(
+                                  alertService.showLoadingAlert(
                                       context, 'Getting sign up user...');
 
                                   UserDTO toSave = UserDTO(
@@ -341,19 +342,21 @@ class _SignUpPageState extends State<SignUpPage> {
                                       image_to_upload);
                                   ResponseDTO<String> response =
                                       await authService.signUp(toSave);
-                                  hideLoadingAlert();
+                                  alertService.hideLoadingAlert();
 
                                   int code = response.code;
                                   String message = response.message;
                                   if (code == Constants.code_warning ||
                                       code == Constants.code_error) {
-                                    successOrWarningOrErrorAlert(
+                                    alertService.successOrWarningOrErrorAlert(
                                         context, code, message, () {
                                       FocusScope.of(context)
                                           .requestFocus(FocusNode());
                                     });
                                   } else if (code == Constants.code_success) {
-                                    successOrWarningOrErrorAlert(context, code,
+                                    alertService.successOrWarningOrErrorAlert(
+                                        context,
+                                        code,
                                         'User registered successfully👌', () {
                                       Navigator.pushReplacement(
                                           context,

@@ -22,6 +22,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   // Main
   FirebaseAuthService authService = FirebaseAuthService();
+  AlertService alertService = AlertService();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   // Controllers
   TextEditingController emailController = TextEditingController(text: "");
@@ -182,17 +183,17 @@ class _SignInPageState extends State<SignInPage> {
                               ? () async {
                                   String email = emailController.text;
                                   String password = passwordController.text;
-                                  showLoadingAlert(
+                                  alertService.showLoadingAlert(
                                       context, 'Getting sign in user...');
                                   ResponseDTO<String> response =
                                       await authService.signIn(email, password);
-                                  hideLoadingAlert();
+                                  alertService.hideLoadingAlert();
 
                                   int code = response.code;
                                   String message = response.message;
                                   if (code == Constants.code_warning ||
                                       code == Constants.code_error) {
-                                    successOrWarningOrErrorAlert(
+                                    alertService.successOrWarningOrErrorAlert(
                                         context, code, message, () {
                                       FocusScope.of(context)
                                           .requestFocus(FocusNode());

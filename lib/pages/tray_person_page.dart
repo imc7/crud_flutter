@@ -17,6 +17,7 @@ class TrayPersonPage extends StatefulWidget {
 
 class _TrayPersonPageState extends State<TrayPersonPage> {
   FirebaseStorageService firebaseStorageService = FirebaseStorageService();
+  AlertService alertService = AlertService();
 
   @override
   void initState() {
@@ -114,17 +115,18 @@ class _TrayPersonPageState extends State<TrayPersonPage> {
                                           IconButton(
                                             icon: new Icon(Icons.delete),
                                             onPressed: () async {
-                                              bool answer = await confirmAlert(
-                                                  context,
-                                                  "Do you want to delete it?");
+                                              bool answer = await alertService
+                                                  .confirmAlert(context,
+                                                      "Do you want to delete it?");
                                               if (answer) {
-                                                showLoadingAlert(context, null);
+                                                alertService.showLoadingAlert(
+                                                    context, null);
                                                 await deletePerson(e.id);
                                                 // Delete photo
                                                 if (e.photoUrl.isNotEmpty)
                                                   await firebaseStorageService
                                                       .deleteFile(e.id);
-                                                hideLoadingAlert();
+                                                alertService.hideLoadingAlert();
                                                 setState(() {});
                                               }
                                             },
